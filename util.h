@@ -11,13 +11,15 @@
 typedef hashmap hashmapF;
 typedef unordered_map <int, string> hashmapE;
 
+// Binary tree node
 struct HuffmanNode {
     int character;
     int count;
-    HuffmanNode* zero;
-    HuffmanNode* one;
+    HuffmanNode* zero;      // left
+    HuffmanNode* one;       // right
 };
 
+// Comparison function for priority queue to sort upon insertion
 struct compare
 {
     bool operator()(const HuffmanNode *lhs,
@@ -28,22 +30,48 @@ struct compare
 };
 
 //
-// *This method frees the memory allocated for the Huffman tree.
+// *Helper function for buildFrequencyMap()
+// Character is passed in as type int for ASCII conversion
 //
-void freeTree(HuffmanNode* node) {
-    
-    // TO DO:  Write this function here.
-    
+void countFrequency (hashmapF &map, int c)
+{
+    if (map.containsKey(c)) {
+        int currValue = map.get(c);
+        map.put(c, currValue + 1);
+    }
+    else {
+        map.put(c, 1);
+    }
 }
 
 //
 // *This function build the frequency map.  If isFile is true, then it reads
 // from filename.  If isFile is false, then it reads from a string filename.
 //
-void buildFrequencyMap(string filename, bool isFile, hashmapF &map) {
-    
-    // TO DO:  Write this function here.
-    
+void buildFrequencyMap(string filename, bool isFile, hashmapF &map) 
+{ 
+    // Read from filename file (assume it exists and can be read)
+    // Map each character ASCII (key) to the number of times it appears (value)
+    if (isFile) 
+    {
+        ifstream inFS(filename);
+        char c;
+
+        while (inFS.get(c)) {
+            countFrequency(map, c);
+        }
+    }
+
+    // Read from filename string
+    // Map each character ASCII (key) to the number of times it appears (value)
+    else {
+        for (char c: filename) {
+            countFrequency(map, c);
+        }
+    }
+
+    // Add a single occurrence of the fake character PSEUDO_EOF into the map
+    map.put(PSEUDO_EOF, 1);
 }
 
 //
@@ -92,7 +120,6 @@ string encode(ifstream& input, hashmapE &encodingMap, ofbitstream& output,
     return "";  // TO DO: update this return
 }
 
-
 //
 // *This function decodes the input stream and writes the result to the output
 // stream using the encodingTree.  This function also returns a string
@@ -103,6 +130,15 @@ string decode(ifbitstream &input, HuffmanNode* encodingTree, ofstream &output) {
     // TO DO:  Write this function here.
     
     return "";  // TO DO: update this return
+}
+
+//
+// *This method frees the memory allocated for the Huffman tree.
+//
+void freeTree(HuffmanNode* node) {
+    
+    // TO DO:  Write this function here.
+    
 }
 
 //
