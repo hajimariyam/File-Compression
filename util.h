@@ -7,6 +7,8 @@
 #pragma once
 
 // TODO: includes go here
+#include <queue>
+using namespace std;
 
 typedef hashmap hashmapF;
 typedef unordered_map <int, string> hashmapE;
@@ -15,16 +17,17 @@ typedef unordered_map <int, string> hashmapE;
 struct HuffmanNode {
     int character;
     int count;
-    HuffmanNode* zero;      // left
-    HuffmanNode* one;       // right
+    HuffmanNode* zero;      // left child
+    HuffmanNode* one;       // right child
 };
 
-// Comparison function for priority queue to sort upon insertion
+// Comparison functor for priority queue to sort upon insertion
 struct compare
 {
     bool operator()(const HuffmanNode *lhs,
         const HuffmanNode *rhs)
     {
+        // Smaller counts have higher priority
         return lhs->count > rhs->count;
     }
 };
@@ -75,13 +78,58 @@ void buildFrequencyMap(string filename, bool isFile, hashmapF &map)
 }
 
 //
-// *This function builds an encoding tree from the frequency map.
+// *This function builds an encoding tree from the frequency map;
+// assume it is valid: 
+//  1) does not contain any keys other than char values, PSEUDO_EOF, and NOT_A_CHAR
+//  2) all counts are positive integers
+//  3) contains at least one key/value pairing
 //
-HuffmanNode* buildEncodingTree(hashmapF &map) {
-    
-    // TO DO:  Write this function here.
-    
-    return nullptr;  // TO DO: update this return
+HuffmanNode* buildEncodingTree(hashmapF &map) 
+{
+    // Use priority queue to keep track of which nodes to process next 
+    //  based on priority defined by compare functor
+    priority_queue < HuffmanNode*, vector<HuffmanNode*>, compare > pq;
+
+    // For each key(character)-value(count) pair in frequency map..
+    vector<int> keysInFreqMap = map.keys();
+    for (int key : keysInFreqMap) 
+    {
+        int value = map.get(key);
+
+        // Create new node
+        HuffmanNode* newNode = new HuffmanNode();
+        newNode->character = key;
+        newNode->count = value;
+        
+        // Insert new node into priority queue
+        pq.push(newNode);
+    }
+
+    // Construct encoding tree
+    // Until 1 binary tree node remains, where other nodes are its children..
+    while (pq.size() > 1) 
+    {
+        // Remove 2 nodes from the front of the queue (smallest counts)
+        HuffmanNode* first = pq.top();
+        pq.pop();
+        HuffmanNode* second = pq.top();
+        pq.pop();
+
+        // Join the 2 nodes into a new joint node
+        HuffmanNode* jointNode = new HuffmanNode();
+        jointNode->character = NOT_A_CHAR;
+        jointNode->count = first->count + second->count;
+
+        // Position the 2 nodes as children of the joint node
+        jointNode->zero = first;        // left child
+        jointNode->one = second;        // right child
+
+        // Insert joint node into queue (sorted by compare functor upon insertion)
+        pq.push(jointNode);
+    }
+
+    // Remaining node is the root of the finished Huffman encoding tree
+    return pq.top();
 }
 
 //
