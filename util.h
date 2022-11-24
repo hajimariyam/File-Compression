@@ -135,22 +135,40 @@ HuffmanNode* buildEncodingTree(hashmapF &map)
 //
 // *Recursive helper function for building the encoding map.
 //
-void _buildEncodingMap(HuffmanNode* node, hashmapE &encodingMap, string str,
-                       HuffmanNode* prev) {
-    
-    // TO DO:  Write this function here.
-    
+void _buildEncodingMap(HuffmanNode* node, hashmapE &encodingMap, string str, HuffmanNode* prev)
+{
+    // Base case
+    if (node == nullptr) {
+        return;
+    }
+    // Pre-order recursion: operation, left, right
+    else {
+        // Search for leaf node
+        if (node->character != NOT_A_CHAR) {	
+            encodingMap.emplace(node->character, str);
+            return;
+        }
+        // Each left branch is a bit value of 0 
+        _buildEncodingMap(node->zero, encodingMap, str+"0", prev);
+        // Each right branch is a bit value of 1
+        _buildEncodingMap(node->one, encodingMap, str+"1", prev);
+    }
 }
 
 //
-// *This function builds the encoding map from an encoding tree.
+// *This function builds the encoding map from a Huffman encoding tree
+// Function parameter is a pointer to the root node of the tree.
 //
-hashmapE buildEncodingMap(HuffmanNode* tree) {
-    hashmapE encodingMap;
+hashmapE buildEncodingMap(HuffmanNode* tree) 
+{
+    hashmapE encodingMap;           // key: character as ASCII, value: binary encoding of character
+    string str = "";                // stores the binary representation of a character
+    HuffmanNode* prev = nullptr;    // provided, unused
     
-    // TO DO:  Write this function here.
+    // Traverse the binary tree to discover the binary encodings of each character
+    _buildEncodingMap(tree, encodingMap, str, prev);
     
-    return encodingMap;  // TO DO: update this return
+    return encodingMap;
 }
 
 //
