@@ -48,8 +48,8 @@ void countFrequency (hashmapF &map, int c)
 }
 
 //
-// *This function build the frequency map.  If isFile is true, then it reads
-// from filename.  If isFile is false, then it reads from a string filename.
+// *This function build the frequency map. If isFile is true, then it reads
+// from filename. If isFile is false, then it reads from a string filename.
 //
 void buildFrequencyMap(string filename, bool isFile, hashmapF &map) 
 { 
@@ -135,7 +135,7 @@ HuffmanNode* buildEncodingTree(hashmapF &map)
 //
 // *Recursive helper function for building the encoding map.
 //
-void _buildEncodingMap(HuffmanNode* node, hashmapE &encodingMap, string str, HuffmanNode* prev)
+void _buildEncodingMap(HuffmanNode* node, hashmapE &encodingMap, string binaryString, HuffmanNode* prev)
 {
     // Base case
     if (node == nullptr) {
@@ -145,13 +145,13 @@ void _buildEncodingMap(HuffmanNode* node, hashmapE &encodingMap, string str, Huf
     else {
         // Search for leaf node
         if (node->character != NOT_A_CHAR) {	
-            encodingMap.emplace(node->character, str);
+            encodingMap.emplace(node->character, binaryString);
             return;
         }
         // Each left branch is a bit value of 0 
-        _buildEncodingMap(node->zero, encodingMap, str+"0", prev);
+        _buildEncodingMap(node->zero, encodingMap, binaryString+"0", prev);
         // Each right branch is a bit value of 1
-        _buildEncodingMap(node->one, encodingMap, str+"1", prev);
+        _buildEncodingMap(node->one, encodingMap, binaryString+"1", prev);
     }
 }
 
@@ -161,34 +161,64 @@ void _buildEncodingMap(HuffmanNode* node, hashmapE &encodingMap, string str, Huf
 //
 hashmapE buildEncodingMap(HuffmanNode* tree) 
 {
-    hashmapE encodingMap;           // key: character as ASCII, value: binary encoding of character
-    string str = "";                // stores the binary representation of a character
-    HuffmanNode* prev = nullptr;    // provided, unused
+    hashmapE encodingMap;               // key: character as ASCII, value: binary encoding of character
+    string binaryString = "";           // stores the binary representation of a character
+    HuffmanNode* prev = nullptr;        // provided, unused
     
     // Traverse the binary tree to discover the binary encodings of each character
-    _buildEncodingMap(tree, encodingMap, str, prev);
+    _buildEncodingMap(tree, encodingMap, binaryString, prev);
     
     return encodingMap;
 }
 
 //
 // *This function encodes the data in the input stream into the output stream
-// using the encodingMap.  This function calculates the number of bits
+// using the encodingMap. This function calculates the number of bits
 // written to the output stream and sets result to the size parameter, which is
-// passed by reference.  This function also returns a string representation of
+// passed by reference. This function also returns a string representation of
 // the output file, which is particularly useful for testing.
+// Assume encoding map, input stream, output stream parameters are valid.
 //
-string encode(ifstream& input, hashmapE &encodingMap, ofbitstream& output,
-              int &size, bool makeFile) {
-    
-    // TO DO:  Write this function here.
-    
-    return "";  // TO DO: update this return
+string encode(ifstream& input, hashmapE &encodingMap, ofbitstream& output, int &size, bool makeFile)
+{
+    int numOfBits = 0;              // Total number of bits written to the output stream
+    char c;                         // A character in the source file
+    string binaryString = "";       // String representation of the bits 
+
+    // For each character in the input stream (source file)..
+    while (input.get(c)) 
+    {
+        // For each bit (0 or 1) in the binary encoding of the character..
+        for (char bit : encodingMap.at(c)) 
+        {
+            // Write the bit to: 1) the output stream (destination file), 2) the string of bits
+            if (makeFile) {
+                output.writeBit(int(bit));
+            }
+            binaryString += bit;
+            numOfBits++;
+        }
+    }
+
+    // Write a single occurrence of the binary encoding for PSEUDO_EOF
+    for (char bit : encodingMap.at(PSEUDO_EOF)) 
+    {
+        if (makeFile) {
+            output.writeBit(int(bit));
+        }
+        binaryString += bit;
+        numOfBits++;
+    }
+
+    size = numOfBits;
+
+    // Return the binary string representation of the source file's text
+    return binaryString;
 }
 
 //
 // *This function decodes the input stream and writes the result to the output
-// stream using the encodingTree.  This function also returns a string
+// stream using the encodingTree. This function also returns a string
 // representation of the output file, which is particularly useful for testing.
 //
 string decode(ifbitstream &input, HuffmanNode* encodingTree, ofstream &output) {
@@ -208,10 +238,10 @@ void freeTree(HuffmanNode* node) {
 }
 
 //
-// *This function completes the entire compression process.  Given a file,
+// *This function completes the entire compression process. Given a file,
 // filename, this function (1) builds a frequency map; (2) builds an encoding
 // tree; (3) builds an encoding map; (4) encodes the file (don't forget to
-// include the frequency map in the header of the output file).  This function
+// include the frequency map in the header of the output file). This function
 // should create a compressed file named (filename + ".huf") and should also
 // return a string version of the bit pattern.
 //
@@ -223,14 +253,14 @@ string compress(string filename) {
 }
 
 //
-// *This function completes the entire decompression process.  Given the file,
+// *This function completes the entire decompression process. Given the file,
 // filename (which should end with ".huf"), (1) extract the header and build
 // the frequency map; (2) build an encoding tree from the frequency map; (3)
-// using the encoding tree to decode the file.  This function should create a
+// using the encoding tree to decode the file. This function should create a
 // compressed file using the following convention.
 // If filename = "example.txt.huf", then the uncompressed file should be named
-// "example_unc.txt".  The function should return a string version of the
-// uncompressed file.  Note: this function should reverse what the compress
+// "example_unc.txt". The function should return a string version of the
+// uncompressed file. Note: this function should reverse what the compress
 // function did.
 //
 string decompress(string filename) {
