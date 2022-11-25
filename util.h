@@ -185,7 +185,7 @@ string encode(ifstream& input, hashmapE &encodingMap, ofbitstream& output, int &
     char c;                         // A character in the source file
     string binaryString = "";       // String representation of the bits 
 
-    // For each character in the input stream (source file)..
+    // For each character from the input stream (source file)..
     while (input.get(c)) 
     {
         // For each bit (0 or 1) in the binary encoding of the character..
@@ -193,7 +193,12 @@ string encode(ifstream& input, hashmapE &encodingMap, ofbitstream& output, int &
         {
             // Write the bit to: 1) the output stream (destination file), 2) the string of bits
             if (makeFile) {
-                output.writeBit(int(bit));
+                if (bit == '0') {
+                    output.writeBit(0);
+                }
+                else if (bit == '1') {
+                    output.writeBit(1);
+                }
             }
             binaryString += bit;
             numOfBits++;
@@ -204,7 +209,12 @@ string encode(ifstream& input, hashmapE &encodingMap, ofbitstream& output, int &
     for (char bit : encodingMap.at(PSEUDO_EOF)) 
     {
         if (makeFile) {
-            output.writeBit(int(bit));
+            if (bit == '0') {
+                output.writeBit(0);
+            }
+            else if (bit == '1') {
+                output.writeBit(1);
+            }
         }
         binaryString += bit;
         numOfBits++;
@@ -212,7 +222,7 @@ string encode(ifstream& input, hashmapE &encodingMap, ofbitstream& output, int &
 
     size = numOfBits;
 
-    // Return the binary string representation of the source file's text
+    // Return the string representation of the encoded text
     return binaryString;
 }
 
@@ -221,11 +231,44 @@ string encode(ifstream& input, hashmapE &encodingMap, ofbitstream& output, int &
 // stream using the encodingTree. This function also returns a string
 // representation of the output file, which is particularly useful for testing.
 //
-string decode(ifbitstream &input, HuffmanNode* encodingTree, ofstream &output) {
-    
-    // TO DO:  Write this function here.
-    
-    return "";  // TO DO: update this return
+string decode(ifbitstream &input, HuffmanNode* encodingTree, ofstream &output) 
+{
+    HuffmanNode* curr = encodingTree;       // Initiate traversal at the root node
+    string textString = "";                 // String representation of the characters
+
+    // For each bit from the input stream (source file)..
+    while (!input.eof())
+    {
+        int bit = input.readBit();
+
+        // Traverse the Huffman tree based on the bit value
+        if (bit == 0) {
+            curr = curr->zero;
+        }
+        else if (bit == 1) {
+            curr = curr->one;
+        }
+
+        // If this is a leaf node..
+        if (curr->character != NOT_A_CHAR) 
+        {	
+            // If the character is PSEUDO_EOF, the decoding process has concluded
+            if (curr->character == PSEUDO_EOF) {
+                break;
+            }
+            
+            // Else, write the character/byte to: 1) the output stream (destination file), 
+            //                                    2) the string of characters
+            output.put(curr->character);
+            textString += curr->character;
+
+            // Initiate traversal for next character at the root node 
+            curr = encodingTree;
+        }
+    }
+
+    // Return the string representation of the decoded characters
+    return textString;
 }
 
 //
