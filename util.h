@@ -78,8 +78,8 @@ void buildFrequencyMap(string filename, bool isFile, hashmapF &map)
 }
 
 //
-// *This function builds an encoding tree from the frequency map;
-// assume it is valid: 
+// *This function builds an encoding tree from the frequency map.
+// Assume the frequency map is valid: 
 //  1) does not contain any keys other than char values, PSEUDO_EOF, and NOT_A_CHAR
 //  2) all counts are positive integers
 //  3) contains at least one key/value pairing
@@ -304,11 +304,40 @@ void freeTree(HuffmanNode* node)
 // should create a compressed file named (filename + ".huf") and should also
 // return a string version of the bit pattern.
 //
-string compress(string filename) {
+string compress(string filename) 
+{
+    hashmapF frequencyMap;
+    HuffmanNode* encodingTree = nullptr;
+    hashmapE encodingMap;
+    bool isFile = true;
+
+    // Build frequency map
+    buildFrequencyMap(filename, isFile, frequencyMap);
+
+    // Build encoding tree
+    encodingTree = buildEncodingTree(frequencyMap);
+
+    // Build encoding map
+    encodingMap = buildEncodingMap(encodingTree);
     
-    // TO DO:  Write this function here.
+    // Prepare an output bit stream to a new .huf file
+    ofbitstream output(filename + ".huf");
+
+    // Output the frequency map to the ofbitstream (file)
+    output << frequencyMap;    
     
-    return "";  // TO DO: update this return
+    // Prepare an input stream from the original filename
+    ifstream input(filename);
+
+    // Encode text
+    int size = 0;
+    string binaryString = encode(input, encodingMap, output, size, true);
+    
+    // Free the encoding tree
+    freeTree(encodingTree);
+    
+    // Return a string representation of the bit pattern
+    return binaryString;
 }
 
 //
