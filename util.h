@@ -351,9 +351,35 @@ string compress(string filename)
 // uncompressed file. Note: this function should reverse what the compress
 // function did.
 //
-string decompress(string filename) {
-    
-    // TO DO:  Write this function here.
-    
-    return "";  // TO DO: update this return
+string decompress(string filename) 
+{
+    // Prepare an input bit stream from the .huf file given
+	ifbitstream input(filename);
+
+    // Prepare an output stream to a new file
+    size_t pos = filename.find(".huf");
+    if ((int)pos >= 0) {
+        filename = filename.substr(0, pos);
+    }
+    pos = filename.find(".");
+    string ext = filename.substr(pos, filename.length() - pos);
+    filename = filename.substr(0, pos);
+    ofstream output(filename + "_unc" + ext);
+
+    // Build frequency map from the ifbitstream
+    hashmapF frequencyMap;
+    input >> frequencyMap;
+
+    // Build encoding tree
+    HuffmanNode* encodingTree = nullptr;  
+    encodingTree = buildEncodingTree(frequencyMap); 
+
+    // Decode text
+    string textString  = decode(input, encodingTree, output);
+
+    // Free the encoding tree
+    freeTree(encodingTree);
+
+    // Return a string representation of the uncompressed file
+    return textString;
 }
