@@ -141,7 +141,7 @@ void _buildEncodingMap(HuffmanNode* node, hashmapE &encodingMap, string binarySt
     if (node == nullptr) {
         return;
     }
-    // Pre-order recursion: operation, left, right
+    // Pre-order traversal: operation, left, right
     else {
         // Search for leaf node
         if (node->character != NOT_A_CHAR) {	
@@ -272,12 +272,28 @@ string decode(ifbitstream &input, HuffmanNode* encodingTree, ofstream &output)
 }
 
 //
+// *Recursive helper function for freeing the Huffman encoding tree.
+//
+void _freeTree (HuffmanNode* node)
+{
+    // Base case
+    if (node == nullptr) {
+        return;
+    }
+
+    // Post-order traversal: left, right, operation
+    _freeTree (node->zero);
+    _freeTree (node->one);
+    delete (node);
+}
+
+//
 // *This method frees the memory allocated for the Huffman tree.
 //
-void freeTree(HuffmanNode* node) {
-    
-    // TO DO:  Write this function here.
-    
+void freeTree(HuffmanNode* node) 
+{
+    // Post-order tree traversal using recursion
+    _freeTree(node);
 }
 
 //
