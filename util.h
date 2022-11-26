@@ -1,12 +1,26 @@
 //
-// STARTER CODE: util.h
+// util.h
 //
-// TODO:  Write your own header
+// Mariyam Haji (mhaji7)
+// University of Illinois, Chicago
+// Project 6 - CS 251 - Fall 2022
+//
+// This is a file compression algorithm that uses binary trees, priority queues, 
+// and a custom hashmap class to allow file compression and decompression 
+// using the standard Huffman algorithm for encoding and decoding.
+//
 //
 
 #pragma once
 
-// TODO: includes go here
+#include "bitstream.h"
+#include "hashmap.h"
+#include "mainprog.h"
+#include <iostream>
+#include <istream>
+#include <ostream>
+#include <fstream>
+#include <sstream>
 #include <queue>
 using namespace std;
 
