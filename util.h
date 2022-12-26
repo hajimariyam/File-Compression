@@ -1,9 +1,9 @@
 //
 // util.h
 //
-// Mariyam Haji (mhaji7)
-// University of Illinois, Chicago
-// Project 6 - CS 251 - Fall 2022
+// Project: File Compression
+// Author: Mariyam Haji
+// System: Visual Studio Code with Ubuntu (WSL 2) on Windows 10
 //
 // This is a file compression algorithm that uses binary trees, priority queues, 
 // and a custom hashmap class to allow file compression and decompression 
@@ -207,6 +207,7 @@ string encode(ifstream& input, hashmapE &encodingMap, ofbitstream& output, int &
         {
             // Write the bit to: 1) the output stream (destination file), 2) the string of bits
             if (makeFile) {
+                // May also use character arithmetic instead of if/else
                 if (bit == '0') {
                     output.writeBit(0);
                 }
