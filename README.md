@@ -4,11 +4,19 @@ This C++ program allows a user to compress and decompress files using the standa
 
 ## How To Use
 
-**COMPRESSION:**
+The menu options 1-6 are for debugging purposes and represent the steps used to perform a Huffman encoding of a given text source file into a destination compressed file and vice versa.
 
+**COMPRESSION:**
+1) Choose menu option C
+2) Enter the file name, for example: myfile.txt
+3) Find the compressed file saved as myfile.txt.huf
+4) Use menu option B to view the binary compressed file
 
 **DECOMPRESSION:**
-
+1) Choose menu option D
+2) Enter the file name, for example: myfile.txt.huf
+3) Find the decompressed file saved as myfile_unc.txt
+4) Use menu option T to view the decompressed text file
 
 ## Huffman Encoding
 
